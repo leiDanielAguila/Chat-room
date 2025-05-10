@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import { TextField } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
@@ -15,8 +15,13 @@ type ChatBoxProps = {
 };
 
 export function ChatBox(props: ChatBoxProps) {
-  // expects type message[]
+  const bottomRef = useRef<HTMLDivElement | null>(null);
   const message = props.messageSent;
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [message]);
+
   return (
     <div className="w-full h-96 overflow-y-auto p-4 mb-8 border border-zinc-700 rounded-lg shadow-2xl bg-stone-50">
       {/* chat messages goes here */}
@@ -37,6 +42,7 @@ export function ChatBox(props: ChatBoxProps) {
           </Box>
         </div>
       ))}
+      <div ref={bottomRef} />
     </div>
   );
 }
@@ -50,14 +56,10 @@ export default function Home() {
     const newMessage: message = {
       id: messages.length + 1,
       text: inputValue,
-    }
+    };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setInputValue("");
   }
-
-  useEffect(()=> {
-    
-  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -70,8 +72,16 @@ export default function Home() {
           className="w-full mt-4"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSendMessage();
+            }
+          }}
         />
-        <div className="flex border border-zinc-700 rounded-lg ml-2 w-8 h-8 items-center justify-center" onClick={handleSendMessage}>
+        <div
+          className="flex border border-zinc-700 rounded-lg ml-2 w-8 h-8 items-center justify-center"
+          onClick={handleSendMessage}
+        >
           <SendRoundedIcon />
         </div>
       </div>
