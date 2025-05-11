@@ -29,7 +29,6 @@ export function ChatBox(props: ChatBoxProps) {
       {message.map((message) => (
         <div key={message.id} className="mb-2">
           <div className="flex flex-row items-center">
-            <span className="font-bold text-gray-800">{`User ${message.id}`}</span>
             <time className="pl-2 ml-2 font-bold text-gray-800">{`${message.timeSent} sent.`}</time>
           </div>
           <Box
@@ -50,18 +49,17 @@ export function ChatBox(props: ChatBoxProps) {
 }
 
 export default function Home() {
-  const placeholder: message = {timeSent: "12:24", id: 1, text: "Hello, how are you?" };
+  const placeholder: message = {
+    timeSent: "12:24 PM",
+    id: 1,
+    text: "Hello, how are you?",
+  };
   const [messages, setMessages] = useState<message[]>([placeholder]);
   const [inputValue, setInputValue] = useState<string>("");
-  const [messageTime, setMessageTime] = useState<string>("");
-
-  useEffect(() => {
-   setMessageTime(new Date().toLocaleTimeString()); 
-  }, [messageTime]);
 
   function handleSendMessage() {
     const newMessage: message = {
-      timeSent: messageTime,
+      timeSent: new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" }),
       id: messages.length + 1,
       text: inputValue,
     };
