@@ -4,10 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import { TextField } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import { v4 as uuidv4 } from "uuid";
+import { UUID } from "crypto";
 
 type message = {
+  id: string;
   timeSent: string;
-  id: number;
   text: string;
 };
 
@@ -50,22 +52,36 @@ export function ChatBox(props: ChatBoxProps) {
 
 export default function Home() {
   const placeholder: message = {
+    id: uuidv4(),
     timeSent: "12:24 PM",
-    id: 1,
     text: "Hello, how are you?",
   };
+  
+  const [newMessage, setNewMessage] = useState<string>("");
   const [messages, setMessages] = useState<message[]>([placeholder]);
-  const [inputValue, setInputValue] = useState<string>("");
 
-  function handleSendMessage() {
-    const newMessage: message = {
-      timeSent: new Date().toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" }),
-      id: messages.length + 1,
-      text: inputValue,
+  function handleSendMessage() { 
+    if (newMessage.trim() === "") {
+      return;
+    }
+
+    const messageModel: message = {
+      id: uuidv4(),
+      timeSent: new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      text: newMessage,
     };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setInputValue("");
+
+    try {            
+      setMessages((prevMessages) => [...prevMessages, messageModel]);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
   }
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -76,8 +92,8 @@ export default function Home() {
           label="Type your message here"
           variant="outlined"
           className="w-full mt-4"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSendMessage();
